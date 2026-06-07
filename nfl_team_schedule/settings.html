@@ -13,8 +13,8 @@
       --nfl-text-muted: var(--text-secondary, var(--color-text-secondary, #475569));
       --nfl-text-soft: var(--text-muted, #64748b);
 
-      --nfl-primary: var(--accent-color, #2563eb);
-      --nfl-info: var(--info-color, #0ea5e9);
+      --nfl-primary: var(--accent-color, #14b8a6);
+      --nfl-info: var(--info-color, #3b82f6);
       --nfl-gold: color-mix(in srgb, #f4c542 72%, var(--nfl-panel) 28%);
 
       --nfl-shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.08);
@@ -245,8 +245,9 @@
       padding: 16px 20px;
     }
 
-    .nfl-link-card a {
-      color: var(--nfl-primary);
+    .nfl-link-card a,
+    .nfl-link-card a:visited {
+      color: var(--nfl-text);
       text-decoration: none;
       font-weight: 700;
       word-break: break-word;
@@ -254,6 +255,7 @@
 
     .nfl-link-card a:hover,
     .nfl-link-card a:focus-visible {
+      color: var(--nfl-primary);
       text-decoration: underline;
       outline: none;
     }
