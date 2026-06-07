@@ -1,0 +1,6 @@
+{
+  "display_name": "NFL Team Schedule",
+  "id": "nfl_team_schedule",
+  "class": "FootballNightBoard",
+  "repository": "https://github.com/shadal18/inkypi-nfl-team-schedule"
+}

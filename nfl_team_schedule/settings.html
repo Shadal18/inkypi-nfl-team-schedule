@@ -1,0 +1,447 @@
+<form>
+  <input type="hidden" name="plugin_id" value="nfl_team_schedule" />
+
+  <style>
+    :root {
+      --nfl-bg: var(--background-color, var(--color-background, #f5f7fb));
+      --nfl-bg-soft: var(--card-background-secondary, var(--color-surface-2, #eef2f7));
+      --nfl-panel: var(--card-background, var(--color-surface, #ffffff));
+      --nfl-panel-2: var(--card-background-hover, var(--color-surface-2, #f8fafc));
+      --nfl-border: var(--border-color, rgba(15, 23, 42, 0.12));
+      --nfl-border-strong: var(--border-color-strong, rgba(15, 23, 42, 0.18));
+      --nfl-text: var(--text-primary, var(--color-text, #0f172a));
+      --nfl-text-muted: var(--text-secondary, var(--color-text-secondary, #475569));
+      --nfl-text-soft: var(--text-muted, #64748b);
+
+      --nfl-primary: var(--accent-color, #2563eb);
+      --nfl-info: var(--info-color, #0ea5e9);
+      --nfl-gold: color-mix(in srgb, #f4c542 72%, var(--nfl-panel) 28%);
+
+      --nfl-shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --nfl-radius-xl: 18px;
+      --nfl-radius-lg: 14px;
+    }
+
+    html.dark,
+    body.dark,
+    [data-theme="dark"],
+    html[data-theme="dark"] {
+      --nfl-bg: var(--background-color, var(--color-background, #0f172a));
+      --nfl-bg-soft: var(--card-background-secondary, var(--color-surface-2, #162033));
+      --nfl-panel: var(--card-background, var(--color-surface, #111827));
+      --nfl-panel-2: var(--card-background-hover, var(--color-surface-2, #172033));
+      --nfl-border: var(--border-color, rgba(255, 255, 255, 0.1));
+      --nfl-border-strong: var(--border-color-strong, rgba(255, 255, 255, 0.16));
+      --nfl-text: var(--text-primary, var(--color-text, #f8fafc));
+      --nfl-text-muted: var(--text-secondary, var(--color-text-secondary, #cbd5e1));
+      --nfl-text-soft: var(--text-muted, #94a3b8);
+      --nfl-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .nfl-settings-container {
+      width: 100%;
+      box-sizing: border-box;
+      color: var(--nfl-text);
+    }
+
+    .nfl-shell {
+      display: grid;
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .nfl-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--nfl-radius-xl);
+      border: 1px solid var(--nfl-border);
+      background:
+        radial-gradient(circle at top right, color-mix(in srgb, var(--nfl-primary) 16%, transparent), transparent 34%),
+        radial-gradient(circle at bottom left, color-mix(in srgb, var(--nfl-info) 12%, transparent), transparent 30%),
+        linear-gradient(180deg, color-mix(in srgb, var(--nfl-panel) 92%, var(--nfl-bg-soft) 8%), var(--nfl-panel-2));
+      box-shadow: var(--nfl-shadow-sm);
+      padding: 22px 22px 18px;
+    }
+
+    .nfl-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--nfl-primary) 14%, transparent);
+      color: var(--nfl-primary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      border: 1px solid color-mix(in srgb, var(--nfl-primary) 22%, transparent);
+    }
+
+    .nfl-hero h2 {
+      margin: 0;
+      color: var(--nfl-text);
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .nfl-hero p {
+      margin: 10px 0 0;
+      max-width: 68ch;
+      color: var(--nfl-text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .nfl-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .nfl-metric {
+      border: 1px solid var(--nfl-border);
+      border-radius: var(--nfl-radius-lg);
+      background: color-mix(in srgb, var(--nfl-panel) 92%, var(--nfl-bg) 8%);
+      padding: 14px 14px 12px;
+      min-width: 0;
+      box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 16%, transparent);
+    }
+
+    .nfl-metric-label {
+      color: var(--nfl-text-soft);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .nfl-metric-value {
+      color: var(--nfl-text);
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .nfl-metric-sub {
+      color: var(--nfl-text-muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .nfl-section,
+    .nfl-link-card {
+      border: 1px solid var(--nfl-border);
+      border-radius: var(--nfl-radius-xl);
+      background: linear-gradient(180deg, var(--nfl-panel), var(--nfl-panel-2));
+      box-shadow: var(--nfl-shadow-sm);
+      overflow: hidden;
+    }
+
+    .nfl-section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--nfl-border);
+    }
+
+    .nfl-section-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      border: 1px solid var(--nfl-border);
+      background: color-mix(in srgb, var(--nfl-bg-soft) 65%, var(--nfl-panel) 35%);
+    }
+
+    .nfl-section-copy {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .nfl-section-title {
+      color: var(--nfl-text);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .nfl-section-subtitle {
+      color: var(--nfl-text-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .nfl-section-body {
+      padding: 18px 20px 20px;
+    }
+
+    .nfl-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .nfl-field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .nfl-label {
+      color: var(--nfl-text-soft);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nfl-input,
+    .nfl-settings-container input[type="text"],
+    .nfl-settings-container select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid var(--nfl-border);
+      background: var(--nfl-panel);
+      color: var(--nfl-text);
+      outline: none;
+      box-sizing: border-box;
+      box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
+    }
+
+    .nfl-input::placeholder,
+    .nfl-settings-container input::placeholder {
+      color: var(--nfl-text-soft);
+      opacity: 1;
+    }
+
+    .nfl-input:focus,
+    .nfl-settings-container input:focus,
+    .nfl-settings-container select:focus {
+      border-color: color-mix(in srgb, var(--nfl-primary) 45%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--nfl-primary) 14%, transparent);
+    }
+
+    .nfl-note {
+      margin: 0;
+      color: var(--nfl-text-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .nfl-link-card {
+      padding: 16px 20px;
+    }
+
+    .nfl-link-card a {
+      color: var(--nfl-primary);
+      text-decoration: none;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .nfl-link-card a:hover,
+    .nfl-link-card a:focus-visible {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    .nfl-link-help {
+      margin-top: 8px;
+      color: var(--nfl-text-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi {
+      left: unset !important;
+      right: 16px !important;
+      bottom: 16px !important;
+    }
+
+    .floating-chat-kofi-popup-iframe {
+      left: unset !important;
+      right: 16px !important;
+      bottom: 76px !important;
+    }
+
+    @media (max-width: 920px) {
+      .nfl-metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nfl-hero {
+        padding: 18px;
+      }
+
+      .nfl-hero h2 {
+        font-size: 22px;
+      }
+
+      .nfl-section-header {
+        padding: 16px;
+      }
+
+      .nfl-section-body,
+      .nfl-link-card {
+        padding: 16px;
+      }
+    }
+  </style>
+
+  <div class="nfl-settings-container">
+    <div class="nfl-shell">
+      <section class="nfl-hero">
+        <div class="nfl-eyebrow">NFL Schedule</div>
+        <h2>Show a team’s next kickoff or most recent game.</h2>
+        <p>
+          Pick an NFL team, optionally add your own title, and the plugin will display either today’s game, the next
+          scheduled matchup, or the most recent finished game when that team is inactive.
+        </p>
+
+        <div class="nfl-metrics">
+          <div class="nfl-metric">
+            <div class="nfl-metric-label">League</div>
+            <div class="nfl-metric-value">NFL</div>
+            <div class="nfl-metric-sub">All current teams supported</div>
+          </div>
+          <div class="nfl-metric">
+            <div class="nfl-metric-label">Fallback</div>
+            <div class="nfl-metric-value">Smart</div>
+            <div class="nfl-metric-sub">Upcoming game or most recent result</div>
+          </div>
+          <div class="nfl-metric">
+            <div class="nfl-metric-label">Display</div>
+            <div class="nfl-metric-value">Matchup</div>
+            <div class="nfl-metric-sub">Time, TV network, venue, and records</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="nfl-section">
+        <div class="nfl-section-header">
+          <span class="nfl-section-icon" aria-hidden="true">🏈</span>
+          <div class="nfl-section-copy">
+            <div class="nfl-section-title">Matchup settings</div>
+            <div class="nfl-section-subtitle">Choose the team and optional title shown on the display.</div>
+          </div>
+        </div>
+
+        <div class="nfl-section-body">
+          <div class="nfl-grid">
+            <div class="nfl-field">
+              <label class="nfl-label" for="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                class="nfl-input"
+                placeholder="Leave blank for automatic title"
+                autocomplete="off"
+              />
+              <p class="nfl-note">Leave blank to use the generated matchup title automatically.</p>
+            </div>
+
+            <div class="nfl-field">
+              <label class="nfl-label" for="nflTeam">NFL team</label>
+              <select id="nflTeam" name="nflTeam" class="nfl-input" required>
+                <option value="ARI">Arizona Cardinals</option>
+                <option value="ATL">Atlanta Falcons</option>
+                <option value="BAL">Baltimore Ravens</option>
+                <option value="BUF">Buffalo Bills</option>
+                <option value="CAR">Carolina Panthers</option>
+                <option value="CHI">Chicago Bears</option>
+                <option value="CIN">Cincinnati Bengals</option>
+                <option value="CLE">Cleveland Browns</option>
+                <option value="DAL">Dallas Cowboys</option>
+                <option value="DEN">Denver Broncos</option>
+                <option value="DET">Detroit Lions</option>
+                <option value="GB">Green Bay Packers</option>
+                <option value="HOU">Houston Texans</option>
+                <option value="IND">Indianapolis Colts</option>
+                <option value="JAX">Jacksonville Jaguars</option>
+                <option value="KC">Kansas City Chiefs</option>
+                <option value="LV">Las Vegas Raiders</option>
+                <option value="LAC">Los Angeles Chargers</option>
+                <option value="LAR">Los Angeles Rams</option>
+                <option value="MIA">Miami Dolphins</option>
+                <option value="MIN">Minnesota Vikings</option>
+                <option value="NE">New England Patriots</option>
+                <option value="NO">New Orleans Saints</option>
+                <option value="NYG">New York Giants</option>
+                <option value="NYJ">New York Jets</option>
+                <option value="PHI">Philadelphia Eagles</option>
+                <option value="PIT">Pittsburgh Steelers</option>
+                <option value="SEA">Seattle Seahawks</option>
+                <option value="SF">San Francisco 49ers</option>
+                <option value="TB">Tampa Bay Buccaneers</option>
+                <option value="TEN">Tennessee Titans</option>
+                <option value="WAS">Washington Commanders</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="nfl-link-card">
+        <a href="https://github.com/shadal18/inkypi-nfl-team-schedule" target="_blank" rel="noopener noreferrer">
+          github.com/shadal18/inkypi-nfl-team-schedule
+        </a>
+        <div class="nfl-link-help">Setup help, updates, release notes, and source code.</div>
+      </section>
+    </div>
+  </div>
+</form>
+
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const defaults = {
+      title: "",
+      nflTeam: "TB",
+    }
+
+    const values =
+      typeof loadPluginSettings !== "undefined" &&
+      loadPluginSettings &&
+      typeof pluginSettings !== "undefined" &&
+      pluginSettings
+        ? Object.assign({}, defaults, pluginSettings)
+        : defaults
+
+    const titleInput = document.getElementById("title")
+    const teamSelect = document.getElementById("nflTeam")
+
+    if (titleInput) {
+      titleInput.value = values.title != null ? values.title : defaults.title
+    }
+
+    if (teamSelect) {
+      teamSelect.value = values.nflTeam != null ? values.nflTeam : defaults.nflTeam
+    }
+
+    if (typeof kofiWidgetOverlay !== "undefined") {
+      kofiWidgetOverlay.draw("shadal", {
+        type: "floating-chat",
+        "floating-chat.donateButton.text": "I ❤️ Coffee",
+        "floating-chat.donateButton.background-color": "#00b9fe",
+        "floating-chat.donateButton.text-color": "#fff",
+      })
+    }
+  })
+</script>

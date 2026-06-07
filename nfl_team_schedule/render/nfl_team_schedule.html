@@ -1,0 +1,184 @@
+{% extends "plugin.html" %} {% block content %}
+<div class="scoreboard">
+  <header class="scoreboard-top">
+    <div class="league-chip">NFL Snapshot</div>
+    <div
+      class="status-chip {% if game_mode == 'last' %}status-last{% elif day == 'Today' %}status-today{% else %}status-upcoming{% endif %}"
+    >
+      {% if game_mode == "last" %} Most Recent {% elif day == "Today" %} Today {% else %} Upcoming {% endif %}
+    </div>
+  </header>
+
+  {% if error %}
+  <section class="hero-band hero-band-empty">
+    <div class="hero-copy">
+      <div class="hero-kicker">NFL Schedule</div>
+      <h1 class="hero-title hero-title-team">{{ nfl_team_name or nfl_team_code }}</h1>
+      <h2 class="hero-empty-status">No Upcoming Games</h2>
+      <div class="empty-copy">
+        {{ nfl_team_name or nfl_team_code }} do not have an upcoming game scheduled right now.
+      </div>
+    </div>
+    <div class="hero-vs">NFL</div>
+  </section>
+  {% else %}
+  <section class="hero-band">
+    <div class="hero-copy">
+      <div class="hero-kicker">NFL Matchup</div>
+      <h1 class="hero-title">
+        {% if title %} {{ title }} {% elif game_mode == "last" %} Last Game {% elif day == "Today" %} Today {% else %}
+        {{ day | default('Schedule') }} Matchup {% endif %}
+      </h1>
+
+      <div class="hero-meta">
+        <span class="meta-pill meta-time">{{ time | default('TBD') }}</span>
+        <span class="meta-pill meta-place">
+          {% if game_mode == "last" %} {{ status_text or 'Final' }} {% else %} {{ venue or 'Stadium TBA' }} {% endif %}
+        </span>
+      </div>
+
+      <div class="broadcast-line">
+        <span class="broadcast-label">TV</span>
+        <span class="broadcast-value">{% if networks %} {{ networks | join(' • ') }} {% else %} TBD {% endif %}</span>
+      </div>
+
+      {% if week_label %}
+      <div class="broadcast-line">
+        <span class="broadcast-label">Week</span>
+        <span class="broadcast-value">{{ week_label }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="hero-vs">VS</div>
+  </section>
+
+  <section class="teams-row">
+    <article class="team-card away-card">
+      <div class="team-card-top away-top">
+        <div class="team-side-label">Away</div>
+        <div class="team-header-name">{{ away_team.get('shortDisplayName') or away_team.get('abbrev', '') }}</div>
+      </div>
+
+      <div class="team-main">
+        <div class="team-logo-wrap">
+          {% if away_team_logo %}
+          <img
+            class="team-logo"
+            src="images/nfl_team_pxl_logos/{{ away_team_logo }}"
+            alt=""
+            onerror="
+              this.style.display = 'none'
+              this.parentElement.classList.add('no-logo')
+            "
+          />
+          {% endif %}
+          <div class="team-fallback-mark">{{ away_team.get('abbrev', '') }}</div>
+        </div>
+
+        <div class="team-details">
+          <div class="team-name">{{ away_team.get('displayName') or away_team.get('abbrev', '') }}</div>
+
+          <div class="record-chip away-record">
+            {{ away_team_stats.get('wins', '0') }}-{{ away_team_stats.get('losses', '0') }}-{{
+            away_team_stats.get('ties', '0') }}
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="team-card home-card">
+      <div class="team-card-top home-top">
+        <div class="team-side-label">Home</div>
+        <div class="team-header-name">{{ home_team.get('shortDisplayName') or home_team.get('abbrev', '') }}</div>
+      </div>
+
+      <div class="team-main">
+        <div class="team-logo-wrap">
+          {% if home_team_logo %}
+          <img
+            class="team-logo"
+            src="images/nfl_team_pxl_logos/{{ home_team_logo }}"
+            alt=""
+            onerror="
+              this.style.display = 'none'
+              this.parentElement.classList.add('no-logo')
+            "
+          />
+          {% endif %}
+          <div class="team-fallback-mark">{{ home_team.get('abbrev', '') }}</div>
+        </div>
+
+        <div class="team-details">
+          <div class="team-name">{{ home_team.get('displayName') or home_team.get('abbrev', '') }}</div>
+
+          <div class="record-chip home-record">
+            {{ home_team_stats.get('wins', '0') }}-{{ home_team_stats.get('losses', '0') }}-{{
+            home_team_stats.get('ties', '0') }}
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="stats-zone">
+    <div class="stats-header-band">
+      <div class="stats-title">Team Stats</div>
+      <div class="stats-subtitle">Season snapshot</div>
+    </div>
+
+    <div class="stats-columns">
+      <div class="stats-column away-stats">
+        <div class="stats-team-banner away-banner">{{ away_team.get('abbrev', '') }}</div>
+
+        <div class="stat-tile tile-red">
+          <span class="tile-label">Wins</span>
+          <span class="tile-value">{{ away_team_stats.get('wins', '0') }}</span>
+        </div>
+
+        <div class="stat-tile tile-yellow">
+          <span class="tile-label">Losses</span>
+          <span class="tile-value">{{ away_team_stats.get('losses', '0') }}</span>
+        </div>
+
+        <div class="stat-tile tile-blue">
+          <span class="tile-label">Points For</span>
+          <span class="tile-value">{{ away_team_stats.get('pointsFor', 'N/A') }}</span>
+        </div>
+
+        <div class="stat-tile tile-green">
+          <span class="tile-label">Points Against</span>
+          <span class="tile-value">{{ away_team_stats.get('pointsAgainst', 'N/A') }}</span>
+        </div>
+      </div>
+
+      <div class="stats-columns-divider"></div>
+
+      <div class="stats-column home-stats">
+        <div class="stats-team-banner home-banner">{{ home_team.get('abbrev', '') }}</div>
+
+        <div class="stat-tile tile-red">
+          <span class="tile-label">Wins</span>
+          <span class="tile-value">{{ home_team_stats.get('wins', '0') }}</span>
+        </div>
+
+        <div class="stat-tile tile-yellow">
+          <span class="tile-label">Losses</span>
+          <span class="tile-value">{{ home_team_stats.get('losses', '0') }}</span>
+        </div>
+
+        <div class="stat-tile tile-blue">
+          <span class="tile-label">Points For</span>
+          <span class="tile-value">{{ home_team_stats.get('pointsFor', 'N/A') }}</span>
+        </div>
+
+        <div class="stat-tile tile-green">
+          <span class="tile-label">Points Against</span>
+          <span class="tile-value">{{ home_team_stats.get('pointsAgainst', 'N/A') }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
