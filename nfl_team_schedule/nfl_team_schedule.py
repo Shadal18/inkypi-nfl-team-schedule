@@ -77,7 +77,7 @@ class FootballNightBoard(BasePlugin):
 
     def get_template_context(self, settings, device_config):
         settings = settings or {}
-        team_code = str(settings.get("nflTeam", "TB")).strip().upper()
+        team_code = str(settings.get("nflTeam", "ARI")).strip().upper()
         custom_title = str(settings.get("title", "")).strip()
         now_utc = datetime.now(timezone.utc)
 
